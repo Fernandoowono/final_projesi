@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <section class="text-center mb-5">
+        <h1 class="fw-bold display-4 text-dark">🎓 Öğrenci Bilgi Sistemi</h1>
+        <p class="lead text-muted mt-3">Akademik işlemlerinizi kolaylaştırın: Kayıt, Ders, Not ve Raporlama tek çatı altında.</p>
+    </section>
+
+    <section class="row g-4">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-lg h-100 text-center">
+                <div class="card-body">
+                    <i class="bi bi-people-fill display-4 text-primary mb-3"></i>
+                    <h5 class="fw-semibold">Öğrenci Yönetimi</h5>
+                    <p class="text-muted">Öğrencilerin bilgilerini yönetin, akademik başarılarını takip edin.</p>
+                    <a href="/students" class="btn btn-outline-primary btn-sm">Detayları Gör</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card border-0 shadow-lg h-100 text-center">
+                <div class="card-body">
+                    <i class="bi bi-journal-bookmark-fill display-4 text-success mb-3"></i>
+                    <h5 class="fw-semibold">Ders Planlaması</h5>
+                    <p class="text-muted">Dersleri tanımlayın, öğretmen atamalarını yönetin.</p>
+                    <a href="/courses" class="btn btn-outline-success btn-sm">Dersleri Gör</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card border-0 shadow-lg h-100 text-center">
+                <div class="card-body">
+                    <i class="bi bi-bar-chart-steps display-4 text-warning mb-3"></i>
+                    <h5 class="fw-semibold">Not ve Raporlar</h5>
+                    <p class="text-muted">Not girişlerini yapın, raporları görüntüleyin ve analiz sağlayın.</p>
+                    <a href="/grades" class="btn btn-outline-warning btn-sm">Notlara Git</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="text-center mt-5">
+        <p class="text-muted fst-italic">Giriş yaparak daha fazla bilgiye erişebilirsiniz. 👨‍🏫 👩‍🎓 👩‍💼</p>
+    </section>
+</div>
+{% endblock %}

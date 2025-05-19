@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2 class="text-center mb-4">Dersler</h2>
+
+    {% if session.get('user_role') == 'admin' %}
+    <div class="text-end mb-3">
+        <a href="{{ url_for('main.add_course') }}" class="btn btn-primary">Ders Ekle</a>
+    </div>
+    {% endif %}
+
+    {% if courses %}
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>Ders Adı</th>
+                <th>Öğretmen</th>
+                <th>Durum</th>
+                {% if session.get('user_role') == 'admin' %}
+                <th>İşlem</th>
+                {% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for course in courses %}
+            <tr>
+                <td>{{ course.name }}</td>
+                <td>{{ course.teacher.name if course.teacher else "Atanmamış" }}</td>
+                <td>{{ "Aktif" if course.active else "Pasif" }}</td>
+                {% if session.get('user_role') == 'admin' %}
+                <td>
+                    <a href="{{ url_for('main.edit_course', course_id=course.id) }}" class="btn btn-warning btn-sm">Düzenle</a>
+                    <a href="{{ url_for('main.delete_course', course_id=course.id) }}" class="btn btn-danger btn-sm"
+                       onclick="return confirm('Bu dersi silmek istediğinizden emin misiniz?');">Sil</a>
+                </td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="alert alert-info text-center">Kayıtlı ders bulunmamaktadır.</div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Öğretmenler</h2>
+
+    {% if teachers %}
+        <div class="list-group">
+            {% for teacher in teachers %}
+                <div class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="mb-1">{{ teacher.name }}</h5>
+                        <small>{{ teacher.email }}</small>
+                    </div>
+                    <span class="badge bg-success rounded-pill">
+                        {{ teacher.department or "Bölüm Belirtilmemiş" }}
+                    </span>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info text-center">Kayıtlı öğretmen bulunmamaktadır.</div>
+    {% endif %}
+</div>
+{% endblock %}
+

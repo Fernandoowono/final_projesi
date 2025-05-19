@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Notlar</h2>
+    <div class="text-end mb-3">
+        <a href="#" class="btn btn-primary">Not Ekle</a>
+    </div>
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Öğrenci Adı</th>
+                <th>Ders</th>
+                <th>Not</th>
+                <th>İşlem</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for note in notes %}
+            <tr>
+                <td>{{ note.student.name }}</td>
+                <td>{{ note.lesson.name }}</td>
+                <td>{{ note.note }}</td>
+                <td>
+                    <a href="#" class="btn btn-warning btn-sm">Düzenle</a>
+                    <a href="#" class="btn btn-danger btn-sm">Sil</a>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="4" class="text-center">Kayıtlı not yok.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

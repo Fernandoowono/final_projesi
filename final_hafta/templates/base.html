@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Öğrenci Bilgi Sistemi</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+    <style>
+        body {
+            display: flex;
+            min-height: 100vh;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f8f9fa;
+        }
+        .sidebar {
+            width: 250px;
+            background-color: #1e1e1e;
+            color: white;
+            padding: 20px;
+        }
+        .sidebar h2 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+        .sidebar .user-name {
+            font-size: 1rem;
+            text-align: center;
+            margin-bottom: 25px;
+            color: #ccc;
+        }
+        .sidebar .nav-link {
+            color: white;
+            margin-bottom: 12px;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+        }
+        .sidebar .nav-link i {
+            margin-right: 10px;
+        }
+        .sidebar .nav-link:hover {
+            background-color: #343a40;
+            padding: 6px;
+            border-radius: 6px;
+            text-decoration: none;
+        }
+        .sidebar .btn {
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+        .content {
+            flex-grow: 1;
+            padding: 40px;
+        }
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: space-around;
+                padding: 15px;
+            }
+            .content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h2 class="text-center">🎓 Öğrenci Bilgi Sistemi</h2>
+
+        {% if session.get('user_name') %}
+        <div class="user-name">{{ session.get('user_name') }}</div>
+        {% endif %}
+
+        <a href="{{ url_for('index') }}" class="nav-link"><i class="bi bi-house-door"></i> Ana Sayfa</a>
+
+        {% if session.get('user_id') %}
+            {% if session.get('user_role') in ['admin', 'teacher'] %}
+                <a href="{{ url_for('students_page') }}" class="nav-link"><i class="bi bi-people"></i> Öğrenciler</a>
+            {% endif %}
+
+            {% if session.get('user_role') == 'admin' %}
+                <a href="{{ url_for('teachers_page') }}" class="nav-link"><i class="bi bi-person-badge"></i> Öğretmenler</a>
+            {% endif %}
+
+            <a href="{{ url_for('lessons_page') }}" class="nav-link"><i class="bi bi-journal-bookmark"></i> Dersler</a>
+
+            {% if session.get('user_role') in ['admin', 'teacher'] %}
+                <a href="{{ url_for('notes_page') }}" class="nav-link"><i class="bi bi-bar-chart-line"></i> Notlar</a>
+            {% endif %}
+
+            {% if session.get('user_role') == 'student' %}
+                <a href="{{ url_for('diaries_page') }}" class="nav-link"><i class="bi bi-journal-text"></i> Günlüklerim</a>
+            {% endif %}
+
+            <hr>
+            <a href="{{ url_for('logout') }}" class="btn btn-outline-light w-100"><i class="bi bi-box-arrow-right"></i> Çıkış Yap</a>
+
+        {% else %}
+            <a href="{{ url_for('login') }}" class="btn btn-outline-light w-100"><i class="bi bi-box-arrow-in-right"></i> Giriş Yap</a>
+            <a href="{{ url_for('register') }}" class="btn btn-light w-100 mt-2"><i class="bi bi-person-plus-fill"></i> Kayıt Ol</a>
+        {% endif %}
+    </div>
+
+    <div class="content">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-center align-items-center vh-100">
+    <div class="card p-4 shadow-lg" style="width: 350px; border-radius: 15px;">
+        <div class="text-center mb-4">
+            <h2 class="fw-bold">Kayıt Ol</h2>
+        </div>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul class="list-unstyled">
+                    {% for category, message in messages %}
+                        <li class="alert alert-{{ category }}">
+                            {{ message }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+        
+        <form method="POST" action="{{ url_for('register') }}">
+            <div class="mb-3">
+                <label for="name" class="form-label fw-semibold">Ad Soyad</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
+                    <input type="text" class="form-control" id="name" name="name" placeholder="Adınızı girin" required>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="email" class="form-label fw-semibold">E-posta</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-envelope-fill"></i></span>
+                    <input type="email" class="form-control" id="email" name="email" placeholder="E-posta adresinizi girin" required>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="role" class="form-label fw-semibold">Kullanıcı Rolü</label>
+                <select class="form-select" id="role" name="role" required>
+                    <option value="Student">Öğrenci</option>
+                    <option value="Teacher">Öğretmen</option>
+                    <option value="Admin">Yönetici</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label fw-semibold">Şifre</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+                    <input type="password" class="form-control" id="password" name="password" placeholder="Şifrenizi girin" required>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="confirm_password" class="form-label fw-semibold">Şifre Tekrar</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+                    <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Şifrenizi tekrar girin" required>
+                </div>
+            </div>
+            <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="terms" name="terms" required>
+                <label class="form-check-label fw-semibold" for="terms">Şartları kabul ediyorum</label>
+            </div>
+            <div class="d-grid mt-3">
+                <button type="submit" class="btn btn-dark btn-lg fw-bold">
+                    Kayıt Ol
+                </button>
+            </div>
+        </form>
+        <div class="text-center mt-4">
+            <p>Zaten hesabınız var mı? <a href="{{ url_for('login') }}">Giriş Yap</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

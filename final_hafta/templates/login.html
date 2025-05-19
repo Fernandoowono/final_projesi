@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-center align-items-center vh-100">
+    <div class="card p-4 shadow-lg" style="width: 350px; border-radius: 15px;">
+        <div class="text-center mb-4">
+            <h2 class="fw-bold">Giriş Yap</h2>
+        </div>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul class="list-unstyled">
+                    {% for category, message in messages %}
+                        <li class="alert alert-{{ category }}">
+                            {{ message }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+
+        <form id="loginForm" method="POST" action="{{ url_for('login') }}">
+            <div class="mb-3">
+                <label for="email" class="form-label fw-semibold">E-posta</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
+                    <input type="email" class="form-control" id="email" name="email" placeholder="E-posta adresinizi girin" required>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label fw-semibold">Şifre</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+                    <input type="password" class="form-control" id="password" name="password" placeholder="Şifrenizi girin" required>
+                </div>
+            </div>
+            <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="rememberMe" name="rememberMe">
+                <label class="form-check-label" for="rememberMe">Beni Hatırla</label>
+            </div>
+            <div class="d-grid mt-3">
+                <button type="submit" class="btn btn-dark btn-lg fw-bold">
+                    GİRİŞ YAP
+                </button>
+            </div>
+        </form>
+        <div class="text-center mt-4">
+            <p>Hesabınız yok mu? <a href="{{ url_for('register') }}">Kayıt Ol</a></p>
+            <p><a href="#">Şifremi Unuttum</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}
