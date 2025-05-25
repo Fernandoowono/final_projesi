@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Dersler</h1>
+
+{% if session.get('user_role') == 'admin' %}
+<form method="POST" action="{{ url_for('add_lesson') }}" class="mb-4">
+    <div class="row">
+        <div class="col-md-6">
+            <label for="name" class="form-label">Ders Adı:</label>
+            <input type="text" name="name" class="form-control" required>
+        </div>
+        <div class="col-md-6">
+            <label for="teacher_id" class="form-label">Öğretmen:</label>
+            <select name="teacher_id" class="form-select">
+                {% for teacher in teachers %}
+                <option value="{{ teacher.id }}">{{ teacher.user.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+    <button type="submit" class="btn btn-primary mt-3">Ders Ekle</button>
+</form>
+{% endif %}
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Ders Adı</th>
+            <th>Öğretmen</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for lesson in lessons %}
+        <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ lesson.name }}</td>
+            <td>{{ lesson.teacher.user.name if lesson.teacher }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

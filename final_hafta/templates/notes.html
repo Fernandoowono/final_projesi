@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Notlar</h1>
+
+{% if session.get('user_role') == 'admin' %}
+<form method="POST" action="{{ url_for('add_note') }}" class="mb-4">
+    <div class="row">
+        <div class="col-md-3">
+            <label for="student_id" class="form-label">Öğrenci:</label>
+            <select name="student_id" class="form-select" required>
+                {% for student in students %}
+                <option value="{{ student.id }}">{{ student.user.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label for="lesson_id" class="form-label">Ders:</label>
+            <select name="lesson_id" class="form-select" required>
+                {% for lesson in lessons %}
+                <option value="{{ lesson.id }}">{{ lesson.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label for="score" class="form-label">Not:</label>
+            <input type="number" name="score" class="form-control" required min="0" max="100">
+        </div>
+        <div class="col-md-3 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary w-100">Not Ekle</button>
+        </div>
+    </div>
+</form>
+{% endif %}
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Öğrenci</th>
+            <th>Ders</th>
+            <th>Not</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for note in notes %}
+        <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ note.student.user.name if note.student }}</td>
+            <td>{{ note.lesson.name if note.lesson }}</td>
+            <td>{{ note.score }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

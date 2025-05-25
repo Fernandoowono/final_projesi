@@ -1,0 +1,19 @@
+<h2>Günlükler</h2>
+
+<form method="POST" action="{{ url_for('add_diary') }}">
+  <input type="text" name="title" placeholder="Günlük Başlığı" required><br>
+  <textarea name="content" placeholder="Bugün ne yaptınız?" required></textarea><br>
+  <button type="submit">Günlük Ekle</button>
+</form>
+
+<ul>
+  {% for diary in diaries %}
+    <li>
+      <strong>{{ diary.date_created.strftime('%Y-%m-%d %H:%M') }}</strong><br>
+      <strong>Başlık:</strong> {{ diary.title }}<br>
+      <strong>İçerik:</strong> {{ diary.content }}
+    </li>
+  {% else %}
+    <li>Henüz günlük eklenmemiş.</li>
+  {% endfor %}
+</ul>

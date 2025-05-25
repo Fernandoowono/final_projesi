@@ -3,72 +3,16 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 from datetime import datetime
-from models import Course, Teacher, Student
-from flask import Blueprint
 
-main = Blueprint('main', __name__)
-
+from models import db, User, Student, Teacher, Lesson, Note, Diary
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SECRET_KEY'] = 'mysecretkey'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-db = SQLAlchemy(app)
+db.init_app(app)
 
-# MODELOS
-
-class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    password = db.Column(db.String(200), nullable=False)
-    role = db.Column(db.String(20), nullable=False)  # admin, teacher, student
-
-    student = db.relationship('Student', backref='user', uselist=False)
-    teacher = db.relationship('Teacher', backref='user', uselist=False)
-
-class Student(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    grade_level = db.Column(db.String(20))
-
-class Teacher(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    department = db.Column(db.String(100))
-
-class Course(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    teacher_id = db.Column(db.Integer, db.ForeignKey('teacher.id'))
-
-class Grade(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    student_id = db.Column(db.Integer, db.ForeignKey('student.id'), nullable=False)
-    course_id = db.Column(db.Integer, db.ForeignKey('course.id'), nullable=False)
-    value = db.Column(db.Float, nullable=False)
-
-class Lesson(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    teacher_id = db.Column(db.Integer, db.ForeignKey('teacher.id'))
-
-class Note(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    student_id = db.Column(db.Integer, db.ForeignKey('student.id'))
-    lesson_id = db.Column(db.Integer, db.ForeignKey('lesson.id'))
-    value = db.Column(db.Float, nullable=False)
-
-class Diary(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    student_id = db.Column(db.Integer, db.ForeignKey('student.id'))
-    title = db.Column(db.String(100), nullable=False)
-    content = db.Column(db.Text, nullable=False)
-    date = db.Column(db.Date, nullable=False)
-    category = db.Column(db.String(50))
-
-# DECORADOR
 
 def login_required(f):
     @wraps(f)
@@ -79,11 +23,11 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
-# RUTAS
 
 @app.route('/')
 def index():
     return render_template('index.html')
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -101,12 +45,14 @@ def login():
             flash('Geçersiz e-posta veya şifre.', 'danger')
     return render_template('login.html')
 
+
 @app.route('/logout')
 @login_required
 def logout():
     session.clear()
     flash("Başarıyla çıkış yaptınız.", "success")
     return redirect(url_for('login'))
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -142,6 +88,7 @@ def register():
         return redirect(url_for('login'))
 
     return render_template('register.html')
+
 
 @app.route('/dashboard')
 @login_required
@@ -180,7 +127,8 @@ def dashboard():
     else:
         flash("Yetkisiz erişim.", "danger")
         return redirect(url_for('login'))
-    
+
+
 @app.route('/students')
 @login_required
 def students_page():
@@ -205,17 +153,52 @@ def teachers_page():
 @login_required
 def lessons_page():
     lessons = Lesson.query.all()
-    return render_template('lessons.html', lessons=lessons)
+    teachers = Teacher.query.all()
+    return render_template('lessons.html', lessons=lessons, teachers=teachers)
+
+
+@app.route('/lessons/add', methods=['POST'])
+@login_required
+def add_lesson():
+    if session.get('user_role') != 'admin':
+        flash("Sadece yöneticiler ders ekleyebilir.", "danger")
+        return redirect(url_for('lessons_page'))
+
+    name = request.form['name']
+    teacher_id = request.form['teacher_id']
+
+    new_lesson = Lesson(name=name, teacher_id=teacher_id)
+    db.session.add(new_lesson)
+    db.session.commit()
+    flash("Ders başarıyla eklendi.", "success")
+    return redirect(url_for('lessons_page'))
 
 
 @app.route('/notes')
 @login_required
 def notes_page():
-    if session.get('user_role') not in ['admin', 'teacher']:
-        flash("Yetkisiz erişim.", "danger")
-        return redirect(url_for('dashboard'))
     notes = Note.query.all()
-    return render_template('notes.html', notes=notes)
+    students = Student.query.all()
+    lessons = Lesson.query.all()
+    return render_template('notes.html', notes=notes, students=students, lessons=lessons)
+
+
+@app.route('/notes/add', methods=['POST'])
+@login_required
+def add_note():
+    if session.get('user_role') != 'admin':
+        flash("Sadece yöneticiler not ekleyebilir.", "danger")
+        return redirect(url_for('notes_page'))
+
+    student_id = request.form['student_id']
+    lesson_id = request.form['lesson_id']
+    value = request.form['score']
+
+    new_note = Note(student_id=student_id, lesson_id=lesson_id, value=value)
+    db.session.add(new_note)
+    db.session.commit()
+    flash("Not başarıyla eklendi.", "success")
+    return redirect(url_for('notes_page'))
 
 
 @app.route('/diaries')
@@ -224,22 +207,48 @@ def diaries_page():
     if session.get('user_role') != 'student':
         flash("Yetkisiz erişim.", "danger")
         return redirect(url_for('dashboard'))
+
     student = Student.query.filter_by(user_id=session['user_id']).first()
-    diaries = Diary.query.filter_by(student_id=student.id).all()
+    diaries = Diary.query.filter_by(student_id=student.id).order_by(Diary.date.desc()).all()
     return render_template('diaries.html', diaries=diaries)
 
-@main.route("/courses")
-def courses_page():
-    if not session.get("user_id"):
-        return redirect(url_for("login"))
 
-    courses = Course.query.outerjoin(Teacher).all()
-    return render_template("courses.html", courses=courses)
+@app.route('/add_diary', methods=['POST'])
+@login_required
+def add_diary():
+    if session.get('user_role') != 'student':
+        flash("Yetkisiz erişim.", "danger")
+        return redirect(url_for('dashboard'))
 
-app.register_blueprint(main)
+    title = request.form.get('title')
+    content = request.form.get('content')
+
+    if not title or not content:
+        flash("Başlık ve içerik zorunludur.", "warning")
+        return redirect(url_for('diaries_page'))
+
+    student = Student.query.filter_by(user_id=session['user_id']).first()
+    if not student:
+        flash("Öğrenci bulunamadı.", "danger")
+        return redirect(url_for('dashboard'))
+    
+    name = request.form.get('name')
+    teacher_id = request.form.get('teacher_id')
+
+    if not name or not teacher_id:
+        flash("Tüm alanları doldurmalısınız.", "warning")
+        return redirect(url_for('lessons_page'))
+
+
+    new_diary = Diary(student_id=student.id, title=title, content=content)
+    db.session.add(new_diary)
+    db.session.commit()
+
+    flash("Günlük başarıyla eklendi.", "success")
+    return redirect(url_for('diaries_page'))
+
 
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
     app.run(debug=True)
-
